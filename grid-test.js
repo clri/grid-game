@@ -93,3 +93,66 @@ checkTest(JSON.stringify(pq) === JSON.stringify(expected),
 //In one more move we'll reach the winner.
 winner = gridUtils.moveOnGrid(pq);
 checkTest(winner, "Winner found");
+
+/* mostEfficientRoute tests:
+ * Check the validity of mER on a small grid
+ */
+winner = gridUtils.mostEfficientRoute(sampleGrid3);
+checkTest(winner, "Winner found");
+let winningGrid3 = [
+  ["Visited00","Lava","Lava"],
+  ["Visited01","Visited02","Mud"],
+  ["Speeder","Visited03","B"]
+];
+expected = { Health: 195, Moves: 447, Grid: winningGrid3 };
+checkTest(JSON.stringify(winner) === JSON.stringify(expected),
+  "Got correct winner");
+
+
+/* isSolvable tests:
+ * Work on the larger grid, to make sure it completes with a decent runtime
+ */
+gridSize = 10;
+
+let sampleGrid10 = [
+  ["A","Lava","Lava","Speeder","Speeder","Mud","Lava","Blank","Lava","Blank"],
+  ["Blank","Speeder","Mud","Lava","Speeder","Speeder","Mud","Blank","Lava","Mud"],
+  ["Blank","Mud","Mud","Blank","Speeder","Blank","Mud","Blank","Lava","Mud"],
+  ["Lava","Speeder","Mud","Blank","Speeder","Blank","Mud","Lava","Lava","Mud"],
+  ["Mud","Lava","Lava","Lava","Mud","Blank","Mud","Speeder","Speeder","Lava"],
+  ["Mud","Lava","Lava","Lava","Lava","Mud","Mud","Blank","Lava","Speeder"],
+  ["Blank","Blank","Mud","Speeder","Mud","Blank","Lava","Lava","Mud","Blank"],
+  ["Blank","Blank","Blank","Blank","Blank","Blank","Blank","Blank","Blank","Blank"],
+  ["Lava","Speeder","Mud","Lava","Mud","Lava","Speeder","Lava","Lava","Lava"],
+  ["Speeder","B","Blank", "Lava","Speeder","Mud","Lava","Mud","Lava","Speeder"]
+];
+let gridObj = {
+ Grid: sampleGrid10,
+ BestRoute: undefined,
+};
+
+let sampleIsSolvable = gridUtils.isSolvable(gridObj);
+checkTest(sampleIsSolvable, "Grid is solvable");
+checkTest(gridObj.BestRoute.length === 10, "Grid cached");
+
+let sampleGridLava = [
+  ["A","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Blank"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Blank","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava","Lava"],
+  ["Speeder","B","Blank", "Lava","Speeder","Mud","Lava","Mud","Lava","Speeder"]
+];
+gridObj = {
+ Grid: sampleGridLava,
+ BestRoute: undefined,
+};
+
+sampleIsSolvable = gridUtils.isSolvable(gridObj);
+checkTest(!sampleIsSolvable, "Grid is not solvable");
+checkTest(gridObj.BestRoute === null, "Grid cached");

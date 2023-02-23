@@ -14,6 +14,34 @@ let startHealth = 200;
 
 global.gridSize = 10;
 
+/*
+ * printRoute: Pretty-print a route in order of nodes visited.
+ * @param grid: The grid with path noted. A 2D array.
+ */
+function printRoute(grid) {
+  if (!grid) {
+    // Don't print.
+    return;
+  }
+  let route = {}
+
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      if (grid[i][j] === "B" || grid[i][j].match(/Visited.*/)) {
+        // Store the coordinates.
+        route[grid[i][j]] = [i, j];
+      }
+    }
+  }
+
+  // Sort alphabetically (i.e. Visited00, Visited01...)
+  // Leave out the first element, as it will be "B", alphabetically.
+  // We'll print that at the end.
+  for (let key of Object.keys(route).sort().slice(1)) {
+    console.log(route[key]);
+  }
+  console.log(route["B"]);
+}
 
 /*
  * priorityQueueInsert: JS has no native PriorityQueue. Let's build one from an
@@ -107,5 +135,64 @@ function moveOnGrid(pq) {
   return undefined;
 }
 
+/*
+ * isSolvable: Returns true if input has a mostEfficientRoute, false if not.
+ * @param inout: Object with two keys, Grid (the grid we want to know about)
+ *               and BestRoute (the best route--if it's already cached, use
+ *               what's there; if not, cache the answer in the object).
+ */
+function isSolvable(input) {
+  if (input.BestRoute) {
+    return 1;
+  }
+  else if (input.BestRoute === null) {
+    return 0;
+  }
 
-module.exports = { priorityQueueInsert, moveOnGrid };
+  input.BestRoute = mostEfficientRoute(input.Grid);
+  return input.BestRoute !== null;
+}
+
+/*
+ * mostEfficientRoute: Returns the most efficient route for a given grid (in
+ * terms of health + remaining moves), if there is one. If not, return null.
+ * @param grid: The grid for which to find the route.
+ */
+function mostEfficientRoute(grid) {
+  let winner = undefined;
+  // Start at A--set it up and push it on the grid
+  // And find B, passing in bx and by
+  let bx = gridSize - 1, by = 0;
+  let ax = 0, ay = 0;
+  for (let i = 0; i < gridSize; ++i) {
+    if (grid[ax][i] === "A") {
+      ay = i;
+    }
+    if (grid[bx][i] === "B") {
+      by = i;
+    }
+  }
+
+  startSquare = {
+    Health:   startHealth,
+    Moves:    startMoves,
+    NumMoves: 0,
+    Grid:     grid,
+    XCoord:   ax,
+    YCoord:   ay,
+  }
+  let priorityQueue = [startSquare];
+
+  while (!winner && priorityQueue.length) {
+    winner = moveOnGrid(priorityQueue);
+  }
+  return winner;
+}
+
+module.exports = {
+  priorityQueueInsert,
+  moveOnGrid,
+  mostEfficientRoute,
+  isSolvable,
+  printRoute
+};
