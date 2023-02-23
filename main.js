@@ -8,7 +8,6 @@ if (process.argv.length < 3) {
 let filename = process.argv[2];
 let gridString = fs.readFileSync(filename, 'utf8');
 
-
 let gridArray = JSON.parse(gridString);
 let gridObj = {
   Grid: gridArray,

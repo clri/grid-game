@@ -74,7 +74,7 @@ let winner = gridUtils.moveOnGrid(pq);
 checkTest(!winner, "No winner found");
 // First one off the queue had valid moves in 3 directions. 2 - 1 (popped) + 3
 // = 4.
-checkTest(pq.length === 4);
+checkTest(pq.length === 4, "Correct length for priority queue");
 grid2[1][1] = "Visited02"; // We'll use this to check values
 expected = [
   // First is unchanged
