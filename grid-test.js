@@ -44,3 +44,52 @@ gridUtils.priorityQueueInsert(pq, { Moves: 5, Health: 3});
 expected = [ { Moves: 0, Health: 0}, { Moves: 1, Health: 1}, { Moves: 5, Health: 3}, { Moves: 4, Health: 4}, { Moves: 4, Health: 5} ];
 checkTest(JSON.stringify(pq) === JSON.stringify(expected),
   "Insert with equal value in middle");
+
+/* moveOnGrid tests:
+ * Make sure moveOnGrid is choosing the best move. We'll use a small grid for
+ * ease of use.
+ */
+gridSize = 3;
+let sampleGrid3 = [
+  ["A","Lava","Lava"],
+  ["Blank","Speeder","Mud"],
+  ["Speeder","Blank","B"]
+];
+sampleGrid3[0][0] = "Visited00";
+
+let grid1 = JSON.parse(JSON.stringify(sampleGrid3));
+grid1[0][1] = "Visited01";
+
+let grid2 = JSON.parse(JSON.stringify(sampleGrid3));
+grid2[1][0] = "Visited01";
+
+// These dummy values here are obviously wrong. That's okay, this isn't an
+// end-to-end test.
+pq = [
+  { Moves: 10, Health: 10, Grid: grid1, XCoord: 0, YCoord: 2, NumMoves: 2 },
+  { Moves: 100, Health: 100, Grid: grid2, XCoord: 1, YCoord: 1, NumMoves: 2 },
+];
+
+let winner = gridUtils.moveOnGrid(pq);
+checkTest(!winner, "No winner found");
+// First one off the queue had valid moves in 3 directions. 2 - 1 (popped) + 3
+// = 4.
+checkTest(pq.length === 4);
+grid2[1][1] = "Visited02"; // We'll use this to check values
+expected = [
+  // First is unchanged
+  { Moves: 10, Health: 10, Grid: grid1, XCoord: 0, YCoord: 2, NumMoves: 2 },
+  // Moving to the lava square at (0, 1)
+  { Health: 50, Moves: 90, NumMoves: 3, Grid: grid2, XCoord: 0, YCoord: 1 },
+  // Moving to the mud square at (1, 2)
+  { Health: 90, Moves: 95, NumMoves: 3, Grid: grid2, XCoord: 1, YCoord: 2 },
+  // Moving to the blank square at (2, 1)
+  { Health: 100, Moves: 99, NumMoves: 3, Grid: grid2, XCoord: 2, YCoord: 1 },
+]
+
+checkTest(JSON.stringify(pq) === JSON.stringify(expected),
+  "Health, moves, grids, etc. are as expected in the priority queue");
+
+//In one more move we'll reach the winner.
+winner = gridUtils.moveOnGrid(pq);
+checkTest(winner, "Winner found");
